@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import com.example.restaurantapplication.databinding.ActivityMainBinding
 import com.example.restaurantapplication.ui.CartFragment
 import com.example.restaurantapplication.ui.HomeFragment
-import com.example.restaurantapplication.ui.MenuFragment
+import com.example.restaurantapplication.ui.ProfileFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -41,8 +41,8 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNav.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.nav_home -> loadFragment(HomeFragment())
-                R.id.nav_menu -> loadFragment(MenuFragment())
                 R.id.nav_cart -> loadFragment(CartFragment())
+                R.id.nav_profile -> loadFragment(ProfileFragment())
             }
             true
         }

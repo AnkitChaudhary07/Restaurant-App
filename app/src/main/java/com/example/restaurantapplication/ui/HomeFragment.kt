@@ -1,5 +1,6 @@
 package com.example.restaurantapplication.ui
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -42,10 +43,13 @@ class HomeFragment : Fragment() {
         // Observe cuisine list
         viewModel.categories.observe(viewLifecycleOwner) { cuisines ->
             binding.rvCuisineCategories.adapter = CuisineCategoryAdapter(cuisines) { cuisine ->
-                Toast.makeText(requireContext(), "Clicked: ${cuisine.cuisine_name}", Toast.LENGTH_SHORT).show()
-                // TODO: Navigate to MenuFragment with selected cuisine
+                val intent = Intent(requireContext(), MenuActivity::class.java)
+                intent.putExtra("CUISINE_NAME", cuisine.cuisine_name)
+                intent.putExtra("CUISINE_ID", cuisine.cuisine_id)
+                startActivity(intent)
             }
         }
+
 
         // Snap one card at a time
         val snapHelper = LinearSnapHelper()

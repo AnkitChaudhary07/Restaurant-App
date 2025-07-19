@@ -1,6 +1,7 @@
 package com.example.restaurantapplication.ui
 
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,8 +22,12 @@ class TopDishAdapter(private val dishes: List<TopDish>) :
             binding.tvDishName.text = dish.name
             binding.tvDishPrice.text = "₹${dish.price}"
             binding.tvDishRating.text = "⭐ ${dish.rating}"
-            binding.btnAddDish.setOnClickListener {
+            binding.btnIncrease.setOnClickListener {
                 Toast.makeText(binding.root.context, "${dish.name} added to cart", Toast.LENGTH_SHORT).show()
+            }
+
+            binding.btnDecrease.setOnClickListener {
+                Toast.makeText(binding.root.context, "${dish.name} removed from cart", Toast.LENGTH_SHORT).show()
             }
 
             // Show loader and clear previous image
@@ -54,7 +59,11 @@ class TopDishAdapter(private val dishes: List<TopDish>) :
         return TopDishViewHolder(binding)
     }
 
-    override fun getItemCount(): Int = dishes.size
+    override fun getItemCount(): Int {
+        Log.d("TopDishAdapter", "Total dishes in adapter: ${dishes.size}")
+        return dishes.size
+    }
+
 
     override fun onBindViewHolder(holder: TopDishViewHolder, position: Int) {
         holder.bind(dishes[position])
