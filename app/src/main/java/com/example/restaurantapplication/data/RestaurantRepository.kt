@@ -1,8 +1,10 @@
 // data/RestaurantRepository.kt
 package com.example.restaurantapplication.data
 
-import com.example.restaurantapplication.data.model.FoodItem
-import org.json.JSONArray
+import android.util.Log
+import com.example.restaurantapplication.R
+import com.example.restaurantapplication.data.model.CuisineCategory
+import com.example.restaurantapplication.data.model.TopDish
 import org.json.JSONObject
 import java.io.*
 import java.net.HttpURLConnection
@@ -10,42 +12,68 @@ import java.net.URL
 
 class RestaurantRepository {
 
-    fun fetchCuisineCategories(): List<String> {
+//    fun getCuisineCategories(): List<CuisineCategory> {
+//        return listOf(
+//            CuisineCategory(1, "Indian", R.drawable.ic_indian),
+//            CuisineCategory(2, "Chinese", R.drawable.ic_chinese),
+//            CuisineCategory(3, "Brazilian", R.drawable.ic_brazilian),
+//            CuisineCategory(4, "Moroccan", R.drawable.ic_moroccan)
+//        )
+//    }
+
+    fun fetchCuisineCategoriesFromApi(page: Int): Triple<List<CuisineCategory>, List<TopDish>, Int> {
         val url = URL("https://uat.onebanc.ai/emulator/interview/get_item_list")
         val connection = url.openConnection() as HttpURLConnection
-        val cuisineList = mutableListOf<String>()
 
         try {
             connection.requestMethod = "POST"
+            connection.setRequestProperty("Content-Type", "application/json")
             connection.setRequestProperty("X-Partner-API-Key", "uonebancservceemultrS3cg8RaL30")
             connection.setRequestProperty("X-Forward-Proxy-Action", "get_item_list")
-            connection.setRequestProperty("Content-Type", "application/json")
             connection.doOutput = true
 
-            val requestBody = JSONObject()
-            requestBody.put("page", 1)
-            requestBody.put("count", 10)
+            val requestBody = """{ "page": $page, "count": 10 }"""
+            connection.outputStream.use {
+                it.write(requestBody.toByteArray())
+            }
 
-            val writer = OutputStreamWriter(connection.outputStream)
-            writer.write(requestBody.toString())
-            writer.flush()
+            if (connection.responseCode == HttpURLConnection.HTTP_OK) {
+                val response = connection.inputStream.bufferedReader().use { it.readText() }
 
-            val responseCode = connection.responseCode
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                val stream = BufferedReader(InputStreamReader(connection.inputStream))
-                val response = stream.readText()
-                stream.close()
+                val cuisinesList = mutableListOf<CuisineCategory>()
+                val topDishesList = mutableListOf<TopDish>()
+                val root = JSONObject(response)
+                val cuisines = root.getJSONArray("cuisines")
+                val totalPages = root.getInt("total_pages")
 
-                val json = JSONObject(response)
-                val data = json.getJSONArray("data")
+                for (i in 0 until cuisines.length()) {
+                    val obj = cuisines.getJSONObject(i)
 
-                for (i in 0 until data.length()) {
-                    val item = data.getJSONObject(i)
-                    val cuisine = item.getString("cuisine_type")
-                    cuisineList.add(cuisine)
+                    // Add to cuisine list
+                    val cuisine = CuisineCategory(
+                        cuisine_id = obj.getString("cuisine_id"),
+                        cuisine_name = obj.getString("cuisine_name"),
+                        cuisine_image_url = obj.getString("cuisine_image_url")
+                    )
+                    cuisinesList.add(cuisine)
+
+                    // Add top 3 dishes of this cuisine
+                    val items = obj.getJSONArray("items")
+                    for (j in 0 until minOf(3, items.length())) {
+                        val item = items.getJSONObject(j)
+                        val dish = TopDish(
+                            id = item.getString("id"),
+                            name = item.getString("name"),
+                            image_url = item.getString("image_url"),
+                            price = item.getString("price"),
+                            rating = item.getString("rating")
+                        )
+                        topDishesList.add(dish)
+                    }
                 }
 
-                return cuisineList.distinct()
+                return Triple(cuisinesList, topDishesList, totalPages)
+
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -53,6 +81,9 @@ class RestaurantRepository {
             connection.disconnect()
         }
 
-        return emptyList()
+        // Return empty if failed
+        return Triple(emptyList(), emptyList(), 1)
     }
+
+
 }

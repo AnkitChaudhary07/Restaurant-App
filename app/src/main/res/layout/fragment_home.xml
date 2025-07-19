@@ -4,14 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.HomeFragment"
-    android:fillViewport="true">
+    android:fillViewport="true" >
 
     <LinearLayout
         android:id="@+id/homeContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:paddingVertical="16dp"
+        android:paddingStart="10dp">
 
         <!-- 🌐 Segment 4: Language Toggle -->
         <Switch
@@ -19,31 +20,34 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="Switch to Hindi" />
+            android:text="Switch to Hindi"
+            android:thumbTint="#FF5722"
+            android:trackTint="#FFCAB3"/>
 
         <!-- Segment 1: Cuisine Categories Horizontal Scroll -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Categories"
-            android:textSize="18sp"
+            android:textSize="22sp"
             android:textStyle="bold"
             android:layout_marginBottom="8dp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvCuisineCategories"
             android:layout_width="match_parent"
-            android:layout_height="140dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:overScrollMode="never"
-            android:layout_marginBottom="16dp" />
+            android:clipToPadding="false"
+            android:layout_marginBottom="16dp"/>
 
         <!-- Segment 2: Top 3 Dishes -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Top Dishes"
-            android:textSize="18sp"
+            android:textSize="22sp"
             android:textStyle="bold"
             android:layout_marginBottom="8dp" />
 

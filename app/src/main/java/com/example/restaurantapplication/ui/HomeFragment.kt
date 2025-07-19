@@ -8,7 +8,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.restaurantapplication.R
+import androidx.recyclerview.widget.LinearSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.example.restaurantapplication.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
@@ -38,29 +39,53 @@ class HomeFragment : Fragment() {
         binding.rvCuisineCategories.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
-        // Optional: Show "Clicked: ..." on item click
-        val cuisineAdapter = CuisineAdapter(emptyList()) { cuisine ->
-            Toast.makeText(requireContext(), "Clicked: $cuisine", Toast.LENGTH_SHORT).show()
-        }
-        binding.rvCuisineCategories.adapter = cuisineAdapter
-
         // Observe cuisine list
-        viewModel.cuisineList.observe(viewLifecycleOwner) { cuisines ->
-            binding.rvCuisineCategories.adapter = CuisineAdapter(cuisines) { cuisine ->
-                Toast.makeText(requireContext(), "Clicked: $cuisine", Toast.LENGTH_SHORT).show()
+        viewModel.categories.observe(viewLifecycleOwner) { cuisines ->
+            binding.rvCuisineCategories.adapter = CuisineCategoryAdapter(cuisines) { cuisine ->
+                Toast.makeText(requireContext(), "Clicked: ${cuisine.cuisine_name}", Toast.LENGTH_SHORT).show()
                 // TODO: Navigate to MenuFragment with selected cuisine
             }
         }
 
-        // Load cuisines
-        viewModel.loadCuisines()
+        // Snap one card at a time
+        val snapHelper = LinearSnapHelper()
+        snapHelper.attachToRecyclerView(binding.rvCuisineCategories)
+
 
         // Language toggle (Segment 4)
         binding.switchLanguage.setOnCheckedChangeListener { _, isChecked ->
-            val language = if (isChecked) "hi" else "en"
+            val language = if (isChecked) "hindi" else "english"
             Toast.makeText(requireContext(), "Switched to $language", Toast.LENGTH_SHORT).show()
             // TODO: Implement actual locale switching logic
         }
+
+        binding.rvCuisineCategories.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val lastVisible = layoutManager.findLastVisibleItemPosition()
+                val totalItemCount = layoutManager.itemCount
+
+                // Load next page if we're near the end
+                if (lastVisible >= totalItemCount - 2) {
+                    viewModel.loadNextPage()
+                }
+            }
+        })
+
+        binding.rvCuisineCategories.post {
+            snapHelper.attachToRecyclerView(binding.rvCuisineCategories)
+            binding.rvCuisineCategories.scrollToPosition(0)
+        }
+
+        viewModel.topDishes.observe(viewLifecycleOwner) { dishes ->
+            binding.rvTopDishes.adapter = TopDishAdapter(dishes)
+            binding.rvTopDishes.layoutManager = LinearLayoutManager(requireContext())
+        }
+
+
+
     }
 
     override fun onDestroyView() {
