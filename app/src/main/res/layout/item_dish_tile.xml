@@ -9,7 +9,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="120dp"
         android:padding="12dp">
 
         <!-- Image with progress bar -->
@@ -91,7 +91,7 @@
                     android:minHeight="0dp" />
 
                 <TextView
-                    android:id="@+id/tvQuantity"
+                    android:id="@+id/tvCount"
                     android:layout_width="40dp"
                     android:layout_height="36dp"
                     android:gravity="center"

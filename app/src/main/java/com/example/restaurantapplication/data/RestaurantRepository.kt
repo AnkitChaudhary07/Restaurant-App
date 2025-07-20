@@ -143,21 +143,25 @@ class RestaurantRepository {
             connection.setRequestProperty("X-Forward-Proxy-Action", "get_item_by_id")
             connection.doOutput = true
 
-            val requestBody = """{ "id": "$itemId" }"""
+            val requestBody = """{ "item_id": "$itemId" }"""
             connection.outputStream.use {
                 it.write(requestBody.toByteArray())
             }
 
             if (connection.responseCode == HttpURLConnection.HTTP_OK) {
                 val response = connection.inputStream.bufferedReader().use { it.readText() }
+
+                // ✅ Log the full response
+                Log.d("RestaurantRepository", "getItemsByFilter response: $response")
+
                 val obj = JSONObject(response)
 
                 return TopDish(
-                    id = obj.getString("id"),
-                    name = obj.getString("name"),
-                    image_url = obj.getString("image_url"),
-                    price = obj.getString("price"),
-                    rating = obj.getString("rating")
+                    id = itemId,
+                    name = obj.getString("item_name"),
+                    image_url = obj.getString("item_image_url"),
+                    price = obj.getString("item_price"),
+                    rating = obj.getString("item_rating")
                 )
             }
         } catch (e: Exception) {
@@ -176,5 +180,65 @@ class RestaurantRepository {
         )
     }
 
+    fun makePayment(
+        totalAmount: String,
+        totalItems: Int,
+        data: List<Map<String, Any>>
+    ): Boolean {
+        val url = URL("https://uat.onebanc.ai/emulator/interview/make_payment")
+        val connection = url.openConnection() as HttpURLConnection
+
+        try {
+            connection.requestMethod = "POST"
+            connection.setRequestProperty("Content-Type", "application/json")
+            connection.setRequestProperty("X-Partner-API-Key", "uonebancservceemultrS3cg8RaL30")
+            connection.setRequestProperty("X-Forward-Proxy-Action", "make_payment")
+            connection.doOutput = true
+
+            // Build JSON body
+            val payload = JSONObject().apply {
+                put("total_amount", totalAmount)
+                put("total_items", totalItems)
+
+                val itemsArray = org.json.JSONArray()
+                for (item in data) {
+                    val itemObject = JSONObject().apply {
+                        put("item_id", item["item_id"])
+                        put("item_price", item["item_price"])
+                        put("item_quantity", item["item_quantity"])
+                    }
+                    itemsArray.put(itemObject)
+                }
+
+                put("data", itemsArray)
+            }
+
+            // ✅ Log the full JSON payload
+            Log.d("PaymentPayload", payload.toString(2))
+
+            // Write to request body
+            connection.outputStream.use {
+                it.write(payload.toString().toByteArray())
+            }
+
+            // Handle response
+            if (connection.responseCode == HttpURLConnection.HTTP_OK) {
+                val response = connection.inputStream.bufferedReader().use { it.readText() }
+                Log.d("Payment", "Payment successful: $response")
+                return true
+            } else {
+                val errorStream = connection.errorStream?.bufferedReader()?.use { it.readText() }
+                Log.e("Payment", "Payment failed. Code: ${connection.responseCode}, Error: $errorStream")
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.e("Payment", "Exception occurred: ${e.message}")
+        } finally {
+            connection.disconnect()
+        }
+
+        return false
+    }
 
 }

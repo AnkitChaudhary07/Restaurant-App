@@ -11,7 +11,7 @@
     <LinearLayout
         android:id="@+id/profileContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="16dp">
 
@@ -37,89 +37,42 @@
             android:layout_marginBottom="4dp" />
 
         <TextView
-            android:id="@+id/tvUserEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="User"
-            android:textSize="20sp"
-            android:textColor="#6B6B6B"
+            android:text="User !"
+            android:textSize="24sp"
             android:layout_gravity="center"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="4dp" />
 
         <!-- 🧾 Previous Orders -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Previous Orders"
-            android:textSize="18sp"
+            android:text="Previous Order"
+            android:textSize="20sp"
             android:textStyle="bold"
+            android:layout_marginTop="49dp"
             android:layout_marginBottom="12dp" />
 
-        <!-- Static Order Cards -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tvLastPayment"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:text=""
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginBottom="42dp"/>
 
-            <!-- Order 1 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:orientation="vertical"
-                android:layout_marginBottom="12dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Order #1001"
-                    android:textStyle="bold"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Date: 2024-07-18"
-                    android:textColor="#666666"
-                    android:layout_marginTop="4dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Amount: ₹349.00"
-                    android:layout_marginTop="4dp" />
-            </LinearLayout>
-
-            <!-- Order 2 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:orientation="vertical"
-                android:layout_marginBottom="12dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Order #1002"
-                    android:textStyle="bold"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Date: 2024-07-16"
-                    android:textColor="#666666"
-                    android:layout_marginTop="4dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Amount: ₹179.00"
-                    android:layout_marginTop="4dp" />
-            </LinearLayout>
+        <Button
+            android:id="@+id/btnProceedToCheckout"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="Explore our top dishes"
+            android:layout_margin="12dp"
+            android:backgroundTint="#FF5722"
+            android:textColor="#FFFFFF"
+            android:layout_gravity="center_horizontal"/>
 
 
-        </LinearLayout>
     </LinearLayout>
 </FrameLayout>

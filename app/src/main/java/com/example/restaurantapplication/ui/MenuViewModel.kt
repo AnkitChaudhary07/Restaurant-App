@@ -18,4 +18,9 @@ class MenuViewModel : ViewModel() {
             _filteredDishes.postValue(result)
         }.start()
     }
+
+    fun getItemDetailsById(itemId: String): TopDish {
+        return repository.getItemById(itemId)
+    }
+
 }

@@ -10,8 +10,11 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
+import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.example.restaurantapplication.R
 import com.example.restaurantapplication.databinding.FragmentHomeBinding
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
@@ -36,7 +39,7 @@ class HomeFragment : Fragment() {
         // Initialize your ViewModel
         viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
 
-        // Set up cuisine categories RecyclerView (Segment 1)
+        // Segment 1: Cuisine Categories
         binding.rvCuisineCategories.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
@@ -50,12 +53,6 @@ class HomeFragment : Fragment() {
             }
         }
 
-
-        // Snap one card at a time
-        val snapHelper = LinearSnapHelper()
-        snapHelper.attachToRecyclerView(binding.rvCuisineCategories)
-
-
         // Language toggle (Segment 4)
         binding.switchLanguage.setOnCheckedChangeListener { _, isChecked ->
             val language = if (isChecked) "hindi" else "english"
@@ -63,33 +60,43 @@ class HomeFragment : Fragment() {
             // TODO: Implement actual locale switching logic
         }
 
+        // Snap one card at a time
+        val pagerSnapHelper = PagerSnapHelper()
+        pagerSnapHelper.attachToRecyclerView(binding.rvCuisineCategories)
+
+// Preload next page when near the end
         binding.rvCuisineCategories.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
                 val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                val lastVisible = layoutManager.findLastVisibleItemPosition()
+                val lastVisible = layoutManager.findLastCompletelyVisibleItemPosition()
                 val totalItemCount = layoutManager.itemCount
 
-                // Load next page if we're near the end
+                // ✅ Preload next page when you're viewing the second last image
                 if (lastVisible >= totalItemCount - 2) {
                     viewModel.loadNextPage()
                 }
             }
         })
 
-        binding.rvCuisineCategories.post {
-            snapHelper.attachToRecyclerView(binding.rvCuisineCategories)
-            binding.rvCuisineCategories.scrollToPosition(0)
-        }
 
         viewModel.topDishes.observe(viewLifecycleOwner) { dishes ->
             binding.rvTopDishes.adapter = TopDishAdapter(dishes)
             binding.rvTopDishes.layoutManager = LinearLayoutManager(requireContext())
         }
 
+        binding.btnProceedToCheckout.setOnClickListener {
+            val fragment = CartFragment()
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragment)  // ID of your container layout
+                .addToBackStack(null)  // Optional: adds to back stack
+                .commit()
 
+            val navView = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_nav)
+            navView.selectedItemId = R.id.nav_cart
 
+        }
     }
 
     override fun onDestroyView() {
